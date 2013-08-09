@@ -4,6 +4,7 @@ using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -19,6 +20,17 @@ namespace PlacetelDialer
 
         static void Main(string[] args)
         {
+            //If the program is executed with admin rights, we register the protocol handler
+            var principal = new WindowsPrincipal(WindowsIdentity.GetCurrent());
+            bool isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
+
+            if (isAdmin)
+            {
+                var r = new RegisterProtocolHandler();
+                r.Register();
+                return;
+            }
+
             Init();
             CheckSettings();
 
@@ -39,15 +51,18 @@ namespace PlacetelDialer
             if (phoneNumber.Length > 50)
                 throw new ArgumentException("Phone number is too long");
 
-            Console.WriteLine("Dialing the phone number '{0}'", phoneNumber);
+            Console.WriteLine("Sent phone number '{0}'", phoneNumber);
 
-            phoneNumber = Regex.Replace(phoneNumber, @"^\+", "00"); //Placetel can't handel the + in the beginning
+            phoneNumber = Regex.Replace(phoneNumber, @"\+", "00"); //Placetel can't handel the + in the beginning
             phoneNumber = Regex.Replace(phoneNumber, @"[^0-9]", ""); //Strip all non number characters from the number.
 
+            Console.WriteLine("Dialing the phone number '{0}'", phoneNumber);
 
-
+            //Make the call
             var client = new PlacetelApiClient.PlacetelClient(_dialerConfig.ApiKey);
             client.InitiateCall(_dialerConfig.SipUser, phoneNumber);
+
+            System.Threading.Thread.Sleep(3000);
         }
 
 
