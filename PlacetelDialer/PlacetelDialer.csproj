@@ -59,6 +59,7 @@
   <PropertyGroup>
     <SignManifests>true</SignManifests>
   </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -73,6 +74,7 @@
     <Compile Include="PlacetelDialerConfig.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RegisterProtocolHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
